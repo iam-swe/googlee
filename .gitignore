@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Cython
+*.c
+*.cpp
+
+# IDE
+.idea/
+
+# Env files
+.env
+.env.*
+
+# Virtual env
+.venv/
