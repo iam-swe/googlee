@@ -1,5 +1,10 @@
 from pathlib import Path
+from google.adk.tools import tool
 
+@tool(
+    name="load_artifacts",
+    description="List all image assets and their available versions."
+)
 def load_artifacts() -> dict:
     project_root = Path(__file__).resolve().parent.parent
     artifacts_dir = project_root / "artifacts"
