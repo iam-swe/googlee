@@ -19,4 +19,14 @@ def generate_output_path(name: str) -> Path:
 
     return asset_dir / f"v{next_version}.png"
 
+def get_latest_image(asset_dir: Path) -> Path:
+    versions = [
+        int(p.stem[1:]) for p in asset_dir.glob("v*.png")
+        if p.stem[1:].isdigit()
+    ]
+    if not versions:
+        raise RuntimeError("No existing versions found")
+
+    return asset_dir / f"v{max(versions)}.png"
+
 

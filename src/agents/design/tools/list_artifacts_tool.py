@@ -1,11 +1,14 @@
 from pathlib import Path
-from google.adk.tools import tool
+from google.adk.tools import FunctionTool
 
-@tool(
-    name="load_artifacts",
-    description="List all image assets and their available versions."
-)
-def load_artifacts() -> dict:
+def list_artifacts() -> dict:
+    """
+    Lists existing creative artifacts and their available versions.
+
+    Returns:
+        dict: A mapping of asset names to version identifiers (e.g. {"login_screen": ["v1", "v2"]}). Returns an empty dictionary if no artifacts are found.
+    """
+
     project_root = Path(__file__).resolve().parent.parent
     artifacts_dir = project_root / "artifacts"
 
@@ -31,4 +34,6 @@ def load_artifacts() -> dict:
 
     return summary
 
-print(load_artifacts())
+list_artifacts_tool = FunctionTool(func=list_artifacts)
+
+print(list_artifacts())

@@ -4,26 +4,19 @@ from google import genai
 import os
 from dotenv import load_dotenv
 from PIL import Image
-from google.adk.tools import tool
-from src.agents.design.utils.artifact_utils import load_prompt, generate_output_path
+from google.adk.tools import  FunctionTool
+
+from utils.artifact_utils import generate_output_path, get_latest_image, load_prompt
 
 load_dotenv()
 
-@tool(
-    name="edit_image",
-    description="Edit the latest version of an existing image asset and create a new version."
-)
-def get_latest_image(asset_dir: Path) -> Path:
-    versions = [
-        int(p.stem[1:]) for p in asset_dir.glob("v*.png")
-        if p.stem[1:].isdigit()
-    ]
-    if not versions:
-        raise RuntimeError("No existing versions found")
-
-    return asset_dir / f"v{max(versions)}.png"
-
 def edit_image(name: str, design_instructions: str):
+    """
+    Edits the latest image for an existing asset using design instructions.
+
+    Returns:
+        None: Saves the edited image as a new version under the asset’s artifacts directory.
+    """
     project_root = Path(__file__).resolve().parent.parent
     asset_dir = project_root / "artifacts" / name
 
@@ -53,6 +46,10 @@ def edit_image(name: str, design_instructions: str):
             output_path = generate_output_path(name)
             image.save(str(output_path))
             print(f" Image saved to {output_path}")
+
+edit_image_tool  = FunctionTool(
+    func=edit_image,
+)
 
 
 # PROJECT_ROOT = Path(__file__).resolve().parent.parent
