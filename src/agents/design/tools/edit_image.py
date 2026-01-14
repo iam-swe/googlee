@@ -28,9 +28,6 @@ def edit_image(name: str, design_instructions: str):
     asset_dir = project_root / "artifacts" / name
 
     latest_image_path = get_latest_image(asset_dir)
-    print("Latest image: ",latest_image_path)
-    output_path = generate_output_path(name)
-    print("Output path: ", output_path)
     base_image = Image.open(latest_image_path)
 
     api_key = os.getenv("GOOGLE_API_KEY")
