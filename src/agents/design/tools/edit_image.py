@@ -31,7 +31,7 @@ def edit_image(name: str, design_instructions: str):
 
     nano_edit_prompt = load_prompt("nano_edit_prompt.md")
     final_prompt = f"{nano_edit_prompt}\n{design_instructions}"
-    print(final_prompt)
+
     response = client.models.generate_content(
         model="gemini-2.5-flash-image",
         contents=[
@@ -50,10 +50,3 @@ def edit_image(name: str, design_instructions: str):
 edit_image_tool  = FunctionTool(
     func=edit_image,
 )
-
-
-# PROJECT_ROOT = Path(__file__).resolve().parent.parent
-# PROMPTS_DIR = PROJECT_ROOT / "prompts"
-#
-# path = PROMPTS_DIR / "sample_design_edit_prompt.md"
-# edit_image("home_bakery",path.read_text(encoding="utf-8"))

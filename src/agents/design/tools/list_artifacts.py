@@ -35,5 +35,3 @@ def list_artifacts() -> dict:
     return summary
 
 list_artifacts_tool = FunctionTool(func=list_artifacts)
-
-print(list_artifacts())
