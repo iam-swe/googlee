@@ -8,7 +8,7 @@ instruction = instruction_path.read_text()
 
 root_agent = Agent(
     model='gemini-2.5-flash',
-    name='root_agent',
+    name='content_agent',
     description='A Social Media Content Agent with expertise in brand communication, promotion, and ethical storytelling. Creates high-impact, platform-specific content that balances clarity, emotional resonance, and strategic intent.',
     instruction=instruction,
 )

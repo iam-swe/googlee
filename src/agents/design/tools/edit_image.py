@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from PIL import Image
 from google.adk.tools import  FunctionTool
 
-from utils.artifact_utils import generate_output_path, get_latest_image, load_prompt
+from agents.design.utils.artifact_utils import generate_output_path, get_latest_image, load_prompt
 
 load_dotenv()
 

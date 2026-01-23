@@ -12,7 +12,7 @@ firecrawl_api_key = os.getenv("FIRECRAWL_API_KEY")
 
 root_agent = Agent(
     model="gemini-2.5-flash",
-    name="root_agent",
+    name="influencer_search_agent",
     instruction=instruction,
     tools=[
         MCPToolset(

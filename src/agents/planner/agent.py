@@ -8,7 +8,7 @@ instruction = instruction_path.read_text()
 
 root_agent = Agent(
     model='gemini-2.5-flash',
-    name='root_agent',
+    name='planner_agent',
     description='A Marketing Strategy Planner Agent that creates comprehensive, actionable marketing plans across Instagram, Threads, LinkedIn, and X (Twitter). Provides separate text and image ideas for each platform and seeks user confirmation before implementation.',
     instruction=instruction,
 )
