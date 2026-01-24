@@ -9,7 +9,7 @@ from agents.planner.agent import root_agent as planner_agent
 # planning_tool = AgentTool(agent=planner_agent)
 
 root_agent = LlmAgent(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash",
     name="MarketingExpert",
     instruction="""
 ### PERSONA
@@ -106,3 +106,8 @@ Action: Ask a clarifying question:
 """,
     sub_agents=[design_agent, content_agent, planner_agent]
 )
+
+
+#Step 1: expert - planner -> ok
+#Step 2: planner - expert ->  not happening
+# Step 3:
