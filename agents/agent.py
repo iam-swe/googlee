@@ -1,12 +1,13 @@
 from google.adk.agents import LlmAgent
+from google.adk.tools import AgentTool
 
 from agents.design.agent import root_agent as design_agent
 from agents.content.agent import root_agent as content_agent
 from agents.planner.agent import root_agent as planner_agent
 
-# content_tool = AgentTool(agent=content_agent)
-# design_tool = AgentTool(agent=design_agent)
-# planning_tool = AgentTool(agent=planner_agent)
+plan_tool = AgentTool(planner_agent)
+content_tool = AgentTool(content_agent)
+design_tool = AgentTool(design_agent)
 
 root_agent = LlmAgent(
     model="gemini-2.5-flash",
@@ -104,10 +105,5 @@ Action: Ask a clarifying question:
 - Delegate all execution to specialized agents.
 - Always maintain clarity before action.
 """,
-    sub_agents=[design_agent, content_agent, planner_agent]
+    tools=[plan_tool, content_tool, design_tool],
 )
-
-
-#Step 1: expert - planner -> ok
-#Step 2: planner - expert ->  not happening
-# Step 3:
