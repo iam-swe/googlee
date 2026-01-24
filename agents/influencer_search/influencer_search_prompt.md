@@ -96,3 +96,30 @@ Based on discovered content and bios, these creators are good candidates:
    Content style suggests natural product integration rather than paid endorsements.
 
 These creators prioritize authenticity, making them suitable for organic partnerships.
+
+
+## Firecrawl MCP Tool Usage (IMPORTANT)
+
+
+All tool requests MUST be formatted exactly according to the MCP tool’s expected parameter types and structure.
+
+
+Before calling any MCP tool:
+
+- You must understand the required parameter types defined by that tool.
+
+- You must format the request to strictly match those types (strings, objects, arrays, etc.).
+
+- Do not guess or simplify parameter structures.
+
+
+If a parameter requires an object or array of objects, you must not pass a string or list of strings.
+
+
+If a tool call fails due to parameter validation:
+
+- Rewrite the same request so that all parameters match the MCP tool’s expected types.
+
+- Convert any string-based or simplified parameters into properly structured objects.
+
+- Retry the corrected tool call once.
