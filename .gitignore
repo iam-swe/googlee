@@ -1,26 +1,25 @@
-# Python
+# --- ADK runtime ---
+.adk/
+**/.adk/
+
+# --- Python cache ---
 __pycache__/
-*.py[cod]
+**/__pycache__/
+*.pyc
+**/*.pyc
 
-# Cython
-*.c
-*.cpp
-
-# IDE
-.idea/
-
-# Env files
+# --- Env ---
 .env
 .env.*
 
-# Virtual env
-.venv/
-
-#.idea
+# --- IDE ---
+.idea/
+.idea/**
 *.iml
-*.xml
 
-.adk/
+# --- Agent artifacts / generated files ---
+agents/**/artifacts/
+agents/**/artifacts/**
 
-src/agents/design/artifacts/
-
+# --- OS ---
+.DS_Store
