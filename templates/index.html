@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Boost AI - Elevate Your Brand Presence</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="main-container">
+        <div class="chat-container">
+            <!-- Header -->
+            <div class="chat-header">
+                <div class="header-content">
+                    <div class="avatar-container">
+                        <div class="avatar">
+                            <svg class="icon-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+                            </svg>
+                        </div>
+                        <div class="status-indicator"></div>
+                    </div>
+                    <div class="header-text">
+                        <h1 class="header-title">Brand Boost AI</h1>
+                        <p class="header-subtitle">Elevate your brand presence</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Area -->
+            <div class="messages-area" id="messagesArea">
+                <div class="message assistant-message">
+                    <div class="message-avatar">
+                        <svg class="icon-stars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                        </svg>
+                    </div>
+                    <div class="message-content">
+                        <p>Hi! I'm here to help you promote your brand. Tell me about your business, and I'll suggest strategies to boost your visibility and reach.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggested Prompts -->
+            <div class="suggested-prompts" id="suggestedPrompts">
+                <div class="prompts-header">
+                    <svg class="icon-rocket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4.5 16.5c-1.5 1.25-2 5-2 5s3.75-.5 5-2c.625-.625 1-1.5 1-2.5v-1m7-12C18 2 22 6 22 6s-4 4-6.5 6.5m-11 0a2.5 2.5 0 0 0 0 3.5L8 19.5a2.5 2.5 0 0 0 3.5 0l9-9"/>
+                    </svg>
+                    Quick Start Ideas
+                </div>
+                <div class="prompts-grid">
+                    <button class="prompt-button" data-prompt="Increase brand awareness" style="background-color: rgba(219, 194, 184, 0.5); border-color: #dbc2b8;">
+                        <div class="prompt-icon" style="background-color: #dbc2b8;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
+                                <polyline points="17 6 23 6 23 12"/>
+                            </svg>
+                        </div>
+                        <span class="prompt-text">Increase brand awareness</span>
+                    </button>
+                    <button class="prompt-button" data-prompt="Social media strategy" style="background-color: rgba(221, 188, 155, 0.5); border-color: #ddbc9b;">
+                        <div class="prompt-icon" style="background-color: #ddbc9b;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z"/>
+                            </svg>
+                        </div>
+                        <span class="prompt-text">Social media strategy</span>
+                    </button>
+                    <button class="prompt-button" data-prompt="Quick marketing wins" style="background-color: rgba(209, 203, 188, 0.5); border-color: #d1cbbc;">
+                        <div class="prompt-icon" style="background-color: #d1cbbc;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+                            </svg>
+                        </div>
+                        <span class="prompt-text">Quick marketing wins</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-wrapper">
+                    <div class="input-container">
+                        <textarea
+                            id="messageInput"
+                            placeholder="Ask me anything about promoting your brand..."
+                            rows="1"
+                        ></textarea>
+                    </div>
+                    <button id="sendButton" class="send-button" disabled>
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"/>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+</body>
+</html>
