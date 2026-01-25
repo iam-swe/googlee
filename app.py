@@ -21,6 +21,7 @@ from dotenv import load_dotenv
 # --- ADK imports ---
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
+from google.genai.types import Content, Part
 
 # -------------------------------------------------------------------
 # Path + environment setup
@@ -47,41 +48,10 @@ app.secret_key = os.environ.get(
 CORS(app)
 
 # -------------------------------------------------------------------
-# In-memory stores (UI-only)
-# -------------------------------------------------------------------
-
-conversations: dict[str, list] = {}
-
-# -------------------------------------------------------------------
 # ADK Session Service (ONE per app)
 # -------------------------------------------------------------------
 
 session_service = InMemorySessionService()
-
-# -------------------------------------------------------------------
-# Helper: normalize ADK output
-# -------------------------------------------------------------------
-
-def normalize_adk_result(result) -> str:
-    """Convert ADK runner output (string / generator / message) into text."""
-    if isinstance(result, str):
-        return result
-
-    if hasattr(result, "__iter__"):
-        parts = []
-        for item in result:
-            if isinstance(item, str):
-                parts.append(item)
-            elif hasattr(item, "text"):
-                parts.append(item.text)
-            else:
-                parts.append(str(item))
-        return "".join(parts)
-
-    if hasattr(result, "text"):
-        return result.text
-
-    return str(result)
 
 # -------------------------------------------------------------------
 # Routes
@@ -95,22 +65,22 @@ def index():
 
 
 @app.route("/api/chat", methods=["POST"])
-def chat():
+async def chat():
     try:
-        # --------------------------------------------------------------
-        # Flask session
-        # --------------------------------------------------------------
-
+        # Get or create session ID and user ID
         session_id = session.get("session_id")
+        user_id = session.get("user_id")
+
         if not session_id:
             session_id = str(uuid.uuid4())
             session["session_id"] = session_id
 
-        # --------------------------------------------------------------
-        # Request parsing
-        # --------------------------------------------------------------
+        if not user_id:
+            user_id = str(uuid.uuid4())
+            session["user_id"] = user_id
 
-        data = request.get_json(force=True, silent=True) or {}
+        # Get user message
+        data = request.get_json()
         user_message = data.get("message", "").strip()
 
         if not user_message:
@@ -119,114 +89,158 @@ def chat():
                 "response": "Please provide a message."
             }), 400
 
-        # --------------------------------------------------------------
-        # UI conversation history
-        # --------------------------------------------------------------
+        # Convert message to Content object
+        message_content = Content(parts=[Part(text=user_message)], role="user")
 
-        conversations.setdefault(session_id, []).append({
-            "role": "user",
-            "content": user_message
-        })
+        # Create session if it doesn't exist
+        existing_session = None
+        try:
+            existing_session = await session_service.get_session(
+                app_name="brand_boost_ai",
+                user_id=user_id,
+                session_id=session_id
+            )
+        except Exception:
+            pass
 
-        # --------------------------------------------------------------
-        # ADK Runner invocation (CORRECT FOR YOUR VERSION)
-        # --------------------------------------------------------------
+        if not existing_session:
+            await session_service.create_session(
+                app_name="brand_boost_ai",
+                user_id=user_id,
+                session_id=session_id
+            )
 
+        # Create runner
         runner = Runner(
             app_name="brand_boost_ai",
             agent=root_agent,
             session_service=session_service,
         )
 
-        # IMPORTANT: positional args only
-        result = runner.run(session_id=session_id,user_id=str(uuid.uuid4()),new_message=user_message)
+        # Run agent
+        result = runner.run(
+            session_id=session_id,
+            user_id=user_id,
+            new_message=message_content
+        )
 
-        agent_response = normalize_adk_result(result)
+        # Iterate through events to get final response
+        final_response_text = ""
+        for event in result:
+            if event.is_final_response() and event.content and event.content.parts:
+                final_response_text = event.content.parts[0].text
 
-        # --------------------------------------------------------------
-        # Store assistant response
-        # --------------------------------------------------------------
+        # Validate response is not empty
+        if not final_response_text or not final_response_text.strip():
+            app.logger.warning("Agent returned empty response")
+            return jsonify({
+                "status": "error",
+                "response": "We're experiencing technical difficulties at the moment. Please try again in a few moments."
+            }), 500
 
-        conversations[session_id].append({
-            "role": "assistant",
-            "content": agent_response
-        })
+        # Check if response contains image references
+        images = extract_image_info(final_response_text)
 
         return jsonify({
             "status": "success",
-            "response": agent_response
+            "response": final_response_text,
+            "images": images
         })
 
     except Exception as e:
         app.logger.exception("Chat processing error")
         return jsonify({
             "status": "error",
-            "response": f"Sorry, I encountered an error: {str(e)}"
+            "response": "We're experiencing technical difficulties at the moment. Please try again in a few moments."
         }), 500
 
 
-@app.route("/api/history", methods=["GET"])
-def get_history():
-    session_id = session.get("session_id")
-    return jsonify({
-        "history": conversations.get(session_id, [])
-    })
+def extract_image_info(text: str) -> list:
+    """Extract recently created images (within last 30 seconds)."""
+    import time
+    images = []
+    artifacts_dir = AGENTS_DIR / "design" / "artifacts"
 
+    if not artifacts_dir.exists():
+        return images
 
-@app.route("/api/clear", methods=["POST"])
-def clear_history():
-    session_id = session.get("session_id")
-    if session_id:
-        conversations.pop(session_id, None)
-        session_service.delete_session(session_id)
-    return jsonify({"status": "success"})
+    current_time = time.time()
+    threshold = 30  # seconds
+
+    # Check all asset directories for recent images
+    for asset_dir in artifacts_dir.iterdir():
+        if not asset_dir.is_dir():
+            continue
+
+        # Get all versions and check modification times
+        recent_versions = []
+        for version_file in sorted(asset_dir.glob("v*.png")):
+            # Check if file was modified recently
+            if current_time - version_file.stat().st_mtime <= threshold:
+                try:
+                    version_num = int(version_file.stem[1:])
+                    recent_versions.append({
+                        "version": version_num,
+                        "url": f"/artifacts/{asset_dir.name}/{version_file.name}",
+                        "mtime": version_file.stat().st_mtime
+                    })
+                except ValueError:
+                    continue
+
+        if recent_versions:
+            # Sort by modification time to get the latest
+            recent_versions.sort(key=lambda x: x["mtime"], reverse=True)
+            images.append({
+                "name": asset_dir.name,
+                "versions": [{"version": v["version"], "url": v["url"]} for v in recent_versions],
+                "latest": recent_versions[0]["url"]
+            })
+
+    return images
 
 
 @app.route("/api/artifacts", methods=["GET"])
-def get_artifacts():
+async def list_artifacts():
+    """List all design artifacts."""
     try:
         artifacts_dir = AGENTS_DIR / "design" / "artifacts"
+
         if not artifacts_dir.exists():
             return jsonify({"artifacts": []})
 
         artifacts = []
-
         for asset_dir in artifacts_dir.iterdir():
             if not asset_dir.is_dir():
                 continue
 
             versions = []
-            latest_version = None
-            latest_path = None
-
-            for version_file in asset_dir.glob("v*.png"):
+            for version_file in sorted(asset_dir.glob("v*.png")):
                 try:
                     version_num = int(version_file.stem[1:])
+                    versions.append({
+                        "version": version_num,
+                        "url": f"/artifacts/{asset_dir.name}/{version_file.name}"
+                    })
                 except ValueError:
                     continue
-
-                versions.append(version_num)
-
-                if latest_version is None or version_num > latest_version:
-                    latest_version = version_num
-                    latest_path = f"/artifacts/{asset_dir.name}/{version_file.name}"
 
             if versions:
                 artifacts.append({
                     "name": asset_dir.name,
-                    "versions": sorted(versions),
-                    "latest": latest_path
+                    "versions": versions,
+                    "latest": versions[-1]["url"] if versions else None
                 })
 
         return jsonify({"artifacts": artifacts})
 
-    except Exception:
-        app.logger.exception("Artifact fetch error")
+    except Exception as e:
+        app.logger.exception("Error listing artifacts")
         return jsonify({"artifacts": []})
 
 
 @app.route("/artifacts/<path:filename>")
 def serve_artifact(filename):
+    """Serve design artifact images."""
     artifacts_dir = AGENTS_DIR / "design" / "artifacts"
     return send_from_directory(artifacts_dir, filename)
 
