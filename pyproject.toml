@@ -10,6 +10,7 @@ dependencies = [
     "flask[async]>=3.0.0",
     "flask-cors>=4.0.0",
     "python-dotenv>=1.0.0",
+    "nest-asyncio>=1.6.0",
 ]
 
 [tool.setuptools.package-dir]

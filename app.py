@@ -12,6 +12,11 @@ import sys
 from pathlib import Path
 import uuid
 from dotenv import load_dotenv
+
+# Apply nest_asyncio to allow nested event loops (helps with Flask + async MCP tools)
+import nest_asyncio
+nest_asyncio.apply()
+
 from google.adk.runners import Runner
 from google.adk.sessions import InMemorySessionService
 from google.genai.types import Content, Part
@@ -55,7 +60,7 @@ async def chat():
 
         await ensure_session_exists(session_id, user_id)
 
-        result = run_agent(session_id, user_id, user_message)
+        result = await run_agent(session_id, user_id, user_message)
         response_text = extract_final_response(result)
 
         if not response_text or not response_text.strip():
@@ -167,7 +172,7 @@ async def ensure_session_exists(session_id, user_id):
         )
 
 
-def run_agent(session_id, user_id, user_message):
+async def run_agent(session_id, user_id, user_message):
     message_content = Content(parts=[Part(text=user_message)], role="user")
 
     runner = Runner(
@@ -176,11 +181,15 @@ def run_agent(session_id, user_id, user_message):
         session_service=session_service,
     )
 
-    return runner.run(
+    events = []
+    async for event in runner.run_async(
         session_id=session_id,
         user_id=user_id,
         new_message=message_content
-    )
+    ):
+        events.append(event)
+
+    return events
 
 
 def extract_final_response(result):
