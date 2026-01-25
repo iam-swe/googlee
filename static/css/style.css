@@ -49,6 +49,13 @@ body {
 .header-content {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
     gap: 1rem;
 }
 
@@ -100,6 +107,37 @@ body {
     font-size: 0.875rem;
     font-weight: 500;
     color: #6b5444;
+}
+
+.new-chat-button {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(219, 194, 184, 0.6);
+    background: rgba(255, 255, 255, 0.8);
+    color: #3d2e23;
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.new-chat-button:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #dbc2b8;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.new-chat-button:active {
+    transform: translateY(0);
+}
+
+.new-chat-button svg {
+    width: 1rem;
+    height: 1rem;
 }
 
 /* Messages area */
@@ -466,5 +504,14 @@ body {
 
     .message-content {
         max-width: 85%;
+    }
+
+    .new-chat-button {
+        padding: 0.5rem;
+        font-size: 0;
+    }
+
+    .new-chat-button svg {
+        margin: 0;
     }
 }
