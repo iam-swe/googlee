@@ -157,7 +157,7 @@ async def ensure_session_exists(session_id, user_id):
     existing_session = None
     try:
         existing_session = await session_service.get_session(
-            app_name="brand_boost_ai",
+            app_name="stratify",
             user_id=user_id,
             session_id=session_id
         )
@@ -166,7 +166,7 @@ async def ensure_session_exists(session_id, user_id):
 
     if not existing_session:
         await session_service.create_session(
-            app_name="brand_boost_ai",
+            app_name="stratify",
             user_id=user_id,
             session_id=session_id
         )
@@ -176,7 +176,7 @@ async def run_agent(session_id, user_id, user_message):
     message_content = Content(parts=[Part(text=user_message)], role="user")
 
     runner = Runner(
-        app_name="brand_boost_ai",
+        app_name="stratify",
         agent=root_agent,
         session_service=session_service,
     )
